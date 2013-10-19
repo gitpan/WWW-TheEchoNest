@@ -3,7 +3,7 @@ package WWW::TheEchoNest;
 use Moose;
 
 BEGIN {
-    $WWW::TheEchoNest::VERSION = "0.2";
+    $WWW::TheEchoNest::VERSION = "0.3";
 }
 
 use Data::Dumper;
@@ -1610,7 +1610,7 @@ WWW::TheEchoNest - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 

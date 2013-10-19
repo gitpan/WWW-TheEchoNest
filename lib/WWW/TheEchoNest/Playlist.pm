@@ -6,7 +6,7 @@ package WWW::TheEchoNest::Playlist;
 use Moose;
 
 {
-    $WWW::TheEchoNest::Playlist::VERSION = '0.2';
+    $WWW::TheEchoNest::Playlist::VERSION = '1.0';
 }
 
 extends 'WWW::TheEchoNest';
@@ -86,7 +86,7 @@ WWW::TheEchoNest::Playlist - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 

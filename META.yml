@@ -31,4 +31,4 @@ requires:
   URI::Escape: 0
   WWW::Mechanize: 0
   XML::Simple: 0
-version: 0.2
+version: 0.3

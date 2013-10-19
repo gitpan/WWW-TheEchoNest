@@ -6,7 +6,7 @@ package WWW::TheEchoNest::TasteProfile;
 use Moose;
 
 {
-    $WWW::TheEchoNest::TasteProfile::VERSION = '0.2';
+    $WWW::TheEchoNest::TasteProfile::VERSION = '1.0';
 }
 
 extends 'WWW::TheEchoNest';
@@ -122,7 +122,7 @@ WWW::TheEchoNest::TasteProfile - Wrapper for The Echo Nest API of music intellig
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 

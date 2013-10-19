@@ -66,7 +66,7 @@ WWW::TheEchoNest::Song - Wrapper for The Echo Nest API of music intelligence son
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 DESCRIPTION
 

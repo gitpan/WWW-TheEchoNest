@@ -93,7 +93,7 @@ WWW::TheEchoNest::Track - Wrapper for The Echo Nest API of music intelligence tr
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 SYNOPSIS
 

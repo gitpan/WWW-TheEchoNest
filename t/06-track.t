@@ -39,62 +39,67 @@ my $catalog_item_id = 'cale';
 my $artist       = 'Weezer';
 my $song_id      = "SOHTZUF12A8C13582B";
 
-my $track = WWW::TheEchoNest::Track->new( api_key => $api_key );
-# $track->debug(1);
-# http://developer.echonest.com/api/v4/track/profile?api_key=FILDTEOIK2HBORODV&format=json&id=TRTLKZV12E5AC92E11&bucket=audio_summary
+SKIP: {
+    skip "api_key not set", 1 if !$api_key;
 
-$track->profile( id     => 'TRTLKZV12E5AC92E11',
-                 bucket => 'audio_summary' );
-
-ok( $track->get('track.audio_md5') =~ /\w{32}/ , "track/profile returned valid audio_md5" );
-
-# no force
+    my $track = WWW::TheEchoNest::Track->new( api_key => $api_key );
+    # $track->debug(1);
+    # http://developer.echonest.com/api/v4/track/profile?api_key=FILDTEOIK2HBORODV&format=json&id=TRTLKZV12E5AC92E11&bucket=audio_summary
     
-$track->upload( # url => './t/test.mp3',
-                url => './t/test.mp3',
-                filetype => 'mp3'
-                );
+    $track->profile( id     => 'TRTLKZV12E5AC92E11',
+                     bucket => 'audio_summary' );
+    
+    ok( $track->get('track.audio_md5') =~ /\w{32}/ , "track/profile returned valid audio_md5" );
+    
+    # no force
+        
+    $track->upload( # url => './t/test.mp3',
+                    url => './t/test.mp3',
+                    filetype => 'mp3'
+                    );
+    
+    ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "our test file still exists and has the correct md5" );
+    
+    $track->upload( # url => './t/test.mp3',
+                    # this is a special case for track/uplad where we add a paramter called force so we can
+                    # send the file even if we think it already exists
+                    force => 1,
+                    url => './t/test.mp3',
+                    filetype => 'mp3'
+                    );
+    
+    ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "force upload of track with url (file) returned correct md5" );
+    
+    $track->upload( # url => './t/test.mp3',
+                    # this is a special case for track/uplad where we add a paramter called force so we can
+                    # send the file even if we think it already exists
+                    force => 1,
+                    url => 'http://www.gina.net/test.mp3',
+                    filetype => 'mp3'
+                    );
+    
+    ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "force upload of track with url (http) returned correct md5" );
+    
+    $track->upload( 
+                    # this is a special case for track/uplad where we add a paramter called force so we can
+                    # send the file even if we think it already exists
+                    track => './t/test.mp3',
+                    filetype => 'mp3'
+                    );
+    
+    ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "upload of track with 'track' param file returned correct md5" );
+    
+    my $track_id = 'TRTLKZV12E5AC92E11';
+     
+    $track->profile(
+        id     =>  $track_id,
+        bucket => [ 'audio_summary' ]
+    );
+    
+    # print Dumper($track->get( 'track.audio_summary' ));
+    
+    # print $track->last_result;
 
-ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "our test file still exists and has the correct md5" );
-
-$track->upload( # url => './t/test.mp3',
-                # this is a special case for track/uplad where we add a paramter called force so we can
-                # send the file even if we think it already exists
-                force => 1,
-                url => './t/test.mp3',
-                filetype => 'mp3'
-                );
-
-ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "force upload of track with url (file) returned correct md5" );
-
-$track->upload( # url => './t/test.mp3',
-                # this is a special case for track/uplad where we add a paramter called force so we can
-                # send the file even if we think it already exists
-                force => 1,
-                url => 'http://www.gina.net/test.mp3',
-                filetype => 'mp3'
-                );
-
-ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "force upload of track with url (http) returned correct md5" );
-
-$track->upload( 
-                # this is a special case for track/uplad where we add a paramter called force so we can
-                # send the file even if we think it already exists
-                track => './t/test.mp3',
-                filetype => 'mp3'
-                );
-
-ok( $track->get('track.md5') eq '0a65922f961d9401dfbcc84c30e0094b' , "upload of track with 'track' param file returned correct md5" );
-
-my $track_id = 'TRTLKZV12E5AC92E11';
- 
-$track->profile(
-    id     =>  $track_id,
-    bucket => [ 'audio_summary' ]
-);
-
-# print Dumper($track->get( 'track.audio_summary' ));
-
-# print $track->last_result;
+} # end skip
 
 1;

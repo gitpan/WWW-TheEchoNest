@@ -3,3 +3,9 @@ Revision history for WWW-TheEchoNest
 0.01    2013-10-01
         First version
 
+0.02    2013-10-19
+        - Added documentation
+        - Changed default response to avoid dying from WWW::Mechanize calls
+        - Changed the name of 'check_status_code' to 'get_status_code' to match
+        the name in the response.
+        

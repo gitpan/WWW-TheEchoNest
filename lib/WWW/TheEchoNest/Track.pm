@@ -1,5 +1,6 @@
-# Track API Methods - FIX ME
 package WWW::TheEchoNest::Track;
+
+# ABSTRACT: Wrapper for The Echo Nest API of music intelligence track calls
 
 use Moose;
 
@@ -88,15 +89,21 @@ __END__
 
 =head1 NAME
 
-WWW::TheEchoNest::Track
+WWW::TheEchoNest::Track - Wrapper for The Echo Nest API of music intelligence track calls
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 SYNOPSIS
 
+ use WWW::TheEchoNest::Track;
  my $track = WWW::TheEchoNest::Track->new( api_key => $api_key );
+ 
+ $track->profile(
+    id     => 'TRTLKZV12E5AC92E11',
+    bucket => 'audio_summary' 
+ );
 
 =head1 DESCRIPTION
 
@@ -161,10 +168,9 @@ If you have an md5 of an available or previously uploaded track
  $track->profile(
     md5 => $track_md5 
  );
- 
 
- or
- 
+or
+
  my $track_id = 'TRTLKZV12E5AC92E11';
  
  $track->profile(

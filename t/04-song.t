@@ -35,50 +35,48 @@ my $catalog_ban_artist_id    = 'ARK3D5J1187B9BA0B8';
 my $catalog_artist_id = 'ARUI8651187B9ACF52';
 my $catalog_item_id = 'cale';
 
-    my $result;    
+SKIP: {
+    skip "api_key not set", 1 if !$api_key;
+        
+    my $result;
     my $song = WWW::TheEchoNest::Song->new(
-                                          api_key => $api_key
-                                         );    
-ok( $song->debug(1) , "debug level to 1" );
-
-$song->debug(0);
-
-ok( $song->search( title => 'Stairway to Heaven'
-                                  , artist => 'Led Zeppelin'
-                                # , bucket => [ 'id:7digital-US' ]
-                                ) , "song/search for Stairway to Heaven - Led Zeppelin" );
-
-ok( $song->get('songs[0].artist_id') =~ /^AR/ , "song/search artist_id is of the correct prefix" );
+                                              api_key => $api_key
+                                             );    
+    ok( $song->debug(1) , "debug level to 1" );
     
-=pod
-
-# need to move these up to a top level test 01
-
-=cut
-
+    $song->debug(0);
+    
+    ok( $song->search( title => 'Stairway to Heaven'
+                                      , artist => 'Led Zeppelin'
+                                    # , bucket => [ 'id:7digital-US' ]
+                                    ) , "song/search for Stairway to Heaven - Led Zeppelin" );
+    
+    ok( $song->get('songs[0].artist_id') =~ /^AR/ , "song/search artist_id is of the correct prefix" );
+            
     my $soid = $song->get( 'songs[0].id' );
     my $arid = $song->get( 'songs[0].artist_id');
-    
-ok( $soid =~ /^SO/ , "song_id has correct prefix (single get)" );
-ok( $arid =~ /^AR/ , "artist_id has correct prefix (single get)" );
-    
+        
+    ok( $soid =~ /^SO/ , "song_id has correct prefix (single get)" );
+    ok( $arid =~ /^AR/ , "artist_id has correct prefix (single get)" );
+        
     my ($sid,$aid) = $song->get( 'songs[0].id' , 'songs[0].artist_id');
-    
-ok( $soid =~ /^SO/ , "song_id has correct prefix (multi get scalar)" );
-ok( $arid =~ /^AR/ , "artist_id has correct prefix (multi get scalar)" );    
-    
+        
+    ok( $soid =~ /^SO/ , "song_id has correct prefix (multi get scalar)" );
+    ok( $arid =~ /^AR/ , "artist_id has correct prefix (multi get scalar)" );    
+        
     my @info = $song->get( 'songs[0].id' , 'songs[0].artist_id');
+    
+    ok( $info[0] =~ /^SO/ , "song_id has correct prefix (single get array)" );
+    ok( $info[1] =~ /^AR/ , "artist_id has correct prefix (single get array)" );
+    
+    ok( $song->profile( id => $soid , bucket => [ 'id:7digital-US' , 'tracks' ]) , "song/profile call" );
+    
+    ok( $song->get( 'songs[0].artist_id' ) =~ /^AR/ , "using id:7digital-US got record with valid artist_id for $soid" );
+    
+    ok( $song->identify( file_location => './t/test.mp3' ) , "song/identify call no meta or parameters just mp3" );
+    
+    ok( $song->get( 'songs[0].artist_name' ) eq 'Aerosmith' , "song was correctly identified" );
 
-ok( $info[0] =~ /^SO/ , "song_id has correct prefix (single get array)" );
-ok( $info[1] =~ /^AR/ , "artist_id has correct prefix (single get array)" );
-
-    # exit;
-ok( $song->profile( id => $soid , bucket => [ 'id:7digital-US' , 'tracks' ]) , "song/profile call" );
-
-ok( $song->get( 'songs[0].artist_id' ) =~ /^AR/ , "using id:7digital-US got record with valid artist_id for $soid" );
-
-ok( $song->identify( file_location => './t/test.mp3' ) , "song/identify call no meta or parameters just mp3" );
-
-ok( $song->get( 'songs[0].artist_name' ) eq 'Aerosmith' , "song was correctly identified" );
-
+} # end skip
+    
 1;

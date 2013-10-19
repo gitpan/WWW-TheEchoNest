@@ -13,7 +13,6 @@ BEGIN {
     use_ok('WWW::TheEchoNest::Artist');
     use_ok('WWW::TheEchoNest::Track');
     use_ok('WWW::TheEchoNest::TasteProfile');
-    use_ok('WWW::TheEchoNest::Sandbox');
     use_ok('WWW::TheEchoNest::Playlist');
     }
 
@@ -38,46 +37,73 @@ my $catalog_ban_artist_id    = 'ARK3D5J1187B9BA0B8';
 my $catalog_artist_id = 'ARUI8651187B9ACF52';
 my $catalog_item_id = 'cale';
 
+# test to make sure a low limit api key allows some basic interaction
+
+my $low_limit_api_key = 'YDLX4ITBBQHH3PHU0'; # the low rate limit key
+
+ok( $low_limit_api_key =~ /[A-Z]/i , "valid low limit api_key");
+
 # And now to test the methods/subroutines.
 
-ok( $api_key =~ /[A-Z]/i , "valid api_key");
+my $artist = WWW::TheEchoNest::Artist->new( api_key => $low_limit_api_key );
 
-my $obj = WWW::TheEchoNest::Artist->new( api_key => $api_key ); 
+$artist->biographies( name => 'Lady GaGa' );
 
-# start some generic tests
+my $the_limit = $artist->rate_limit();
 
-# need to call something to get have the other data available
-ok( $obj->biographies( name => 'Lady GaGa' ) , 'can call artist/biographies with parameters' );
+until ($artist->rate_limit_used() > $the_limit) {
 
-ok( $obj->sanity_check_id('1234') == 1 , 'can call sanity_check' );
+    $artist->biographies( name => 'Lady GaGa' );
+    sleep 1;
 
-ok( $obj->get_header_item('X-Ratelimit-Limit') =~ /\d/, "call for X-Ratelimit-Limit from http header" );
+}
+
+ok( $artist->get_status_code eq "Rate Limit Exceeded" && $artist->get_status_code(1) == 3 , "properly handled over rate limit call" );
+
+SKIP: {
+    skip "api_key not set", 1 if !$api_key;
     
-ok(  $obj->get_header_item('Client-Date') =~ /\d{4}/, "call for Client-Date from http header" );
+    my $obj = WWW::TheEchoNest::Artist->new( api_key => $api_key );
+    
+    my @grp = $obj->get_request_parameter('song/search','limit');
+    
+    ok(  $grp[0] == 0, "check for existing request parameter value" );
+    
+    ok(  $obj->set_request_parameter('bogus/call', [ 'bogus_butt',1 ]) , "create new request parameter and value" );
+    
+    ok(  $obj->set_request_parameter('song/search', [ 'limit',1 ]) , "change value for existing request parameter value" );
+    
+    @grp = $obj->get_request_parameter('song/search','limit');
+    
+    ok(  $grp[0] == 1 , "verfied setting" );
+    
+    ok(  Dumper($obj->get_request_parameter('playlist/dynamic/create', 'session_catalog')) , "what?" );
 
-ok(  $obj->rate_limit() =~ /\d/ , "convenience rate_limit call" );
+    
+    
+    # start some generic tests
+    
+    # need to call something to get have the other data available
+    ok( $obj->biographies( name => 'Lady GaGa' ) , 'can call artist/biographies with parameters' );
+    
+    ok( $obj->sanity_check_id('1234') == 1 , 'can call sanity_check' );
+    
+    ok( $obj->get_header_item('X-Ratelimit-Limit') =~ /\d/, "call for X-Ratelimit-Limit from http header" );
+        
+    ok(  $obj->get_header_item('Client-Date') =~ /\d{4}/, "call for Client-Date from http header" );
+    
+    ok(  $obj->rate_limit() =~ /\d/ , "convenience rate_limit call" );
+    
+    ok(  $obj->rate_limit_used() =~ /\d/ , "convenience rate_limit_used call" );
+    
+    ok(  $obj->rate_limit_remaining() =~ /\d/ , "convenience rate_limit_remaining" );
+    
+    ok( $obj->auto_json_decode(1) , "set auto_json_decode to 1 (on)" );
+    
+    ok( ref($obj->biographies( name => 'Lady GaGa' )) eq 'HASH' , "post auto_json_decode call returns perl data structure" );
 
-ok(  $obj->rate_limit_used() =~ /\d/ , "convenience rate_limit_used call" );
+} # end skip
 
-ok(  $obj->rate_limit_remaining() =~ /\d/ , "convenience rate_limit_remaining" );
-
-my @grp = $obj->get_request_parameter('song/search','limit');
-
-ok(  $grp[0] == 0, "check for existing request parameter value" );
-
-ok(  $obj->set_request_parameter('bogus/call', [ 'bogus_butt',1 ]) , "create new request parameter and value" );
-
-ok(  $obj->set_request_parameter('song/search', [ 'limit',1 ]) , "change value for existing request parameter value" );
-
-@grp = $obj->get_request_parameter('song/search','limit');
-
-ok(  $grp[0] == 1 , "verfied setting" );
-
-ok(  Dumper($obj->get_request_parameter('playlist/dynamic/create', 'session_catalog')) , "what?" );
-
-ok( $obj->auto_json_decode(1) , "set auto_json_decode to 1 (on)" );
-
-ok( ref($obj->biographies( name => 'Lady GaGa' )) eq 'HASH' , "post auto_json_decode call returns perl data structure" );
 
 
 __END__
@@ -94,8 +120,8 @@ ok( $obj->blogs(),       'can call $obj->blogs() without params' );
 ok( $obj->build_url_base($call_type), 'can call $obj->build_url_base()' );
 ok( $obj->build_url_base(), 'can call $obj->build_url_base() without params' );
 
-ok( $obj->check_result_code(),
-    'can call $obj->check_result_code() without params' );
+ok( $obj->get_status_code(),
+    'can call $obj->get_status_code() without params' );
 
 ok( $obj->codegen_mp3(), 'can call $obj->codegen_mp3() without params' );
 

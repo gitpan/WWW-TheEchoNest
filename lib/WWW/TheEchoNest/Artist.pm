@@ -2,7 +2,7 @@ package WWW::TheEchoNest::Artist;
 
 use Moose;
 
-# ABSTRACT: Wrapper for The Echo Nest API of music intelligence
+# ABSTRACT: Wrapper for The Echo Nest API of music intelligence artist calls
 
 {
     $WWW::TheEchoNest::Artist::VERSION = '1.0';
@@ -174,11 +174,19 @@ __END__
 
 =head1 NAME
 
-WWW::TheEchoNest::Artist - Wrapper for The Echo Nest API of music intelligence
+WWW::TheEchoNest::Artist - Wrapper for The Echo Nest API of music intelligence artist calls
 
 =head1 VERSION
 
-version 0.1
+version 0.2
+
+=head1 SYNOPSIS
+
+ use WWW::TheEchoNest::Artist;
+ 
+ my $api_key = 'YOUR API KEY';
+ 
+ my $artist = WWW::TheEchoNest::Artist->new( api_key => $api_key );
 
 =head1 DESCRIPTION
 
@@ -188,41 +196,48 @@ The Echo Nest artist related calls are provided by this module
 
 WWW::TheEchoNest::Artist
 
-=head1 REQUIRES
-
-L<Data::Dumper> 
-
-L<Moose> 
-
 =head1 METHODS
 
 =head2 biographies
 
- biographies();
+ $artist->biographies( name => 'Lady GaGa' );
 
 =head2 blogs
 
- blogs();
+ $artist->blogs();
 
 =head2 consolidate
 
- consolidate();
+This is a convienence method that allows you to call several of the
+artist calls via a single method.
+
+NOTE each call is made independently by the colsidate method and will
+increment your rate limit used by the number of calls passed in.
+
+It is recommended you ensure what you are doing works outside of
+the context of condolidate before using it.
+
+ my @results = $ten_artist->consolidate(
+                        calls => [ 'biographies' , 'hotttnesss' , 'images' ],
+                        name => 'Lady GaGa',
+                        results => 1
+                                       );
 
 =head2 extract
 
- extract();
+ $artist->extract();
 
 =head2 familiarity
 
- familiarity();
+ $artist->familiarity();
 
 =head2 hotttnesss
 
- hotttnesss();
+ $artist->hotttnesss();
 
 =head2 images
 
- images();
+ $artist->images();
 
 =head2 list_genres
 
@@ -235,59 +250,59 @@ L<Moose>
 
 =head2 list_terms
 
- list_terms();
+ $artist->list_terms( name => 'Lady GaGa' );
 
 =head2 news
 
- news();
+ $artist->news( name => 'Lady GaGa' );
 
 =head2 profile
 
- profile();
+ $artist->profile( name => 'Lady GaGa' );
 
 =head2 reviews
 
- reviews();
+ $artist->reviews( name => 'Lady GaGa' );
 
 =head2 search
 
- search();
+ $artist->search( name => 'Lady GaGa' );
 
 =head2 similar
 
- similar();
+ $artist->similar( name => 'Lady GaGa' );
 
 =head2 songs
 
- songs();
+ $artist->songs( name => 'Lady GaGa' );
 
 =head2 suggest
 
- suggest();
+ $artist->suggest( name => 'Lady GaGa' );
 
 =head2 terms
 
- terms();
+ $artist->terms( name => 'Lady GaGa' );
 
 =head2 top_hottt
 
- top_hottt();
+ $artist->top_hottt( name => 'Lady GaGa' );
 
 =head2 top_terms
 
- top_terms();
+ $artist->top_terms( name => 'Lady GaGa' );
 
 =head2 twitter
 
- twitter();
+ $artist->twitter( name => 'Lady GaGa' );
 
 =head2 urls
 
- urls();
+ $artist->urls( name => 'Lady GaGa' );
 
 =head2 video
 
- video();
+ $artist->video( name => 'Lady GaGa' );
 
 =head1 AUTHOR
 

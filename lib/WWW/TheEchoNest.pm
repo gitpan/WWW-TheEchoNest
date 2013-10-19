@@ -1,13 +1,9 @@
 package WWW::TheEchoNest;
 
 use Moose;
-#use Log::Log4perl qw(:easy);
-
-#with 'MooseX::Log::Log4perl::Easy';
 
 BEGIN {
-    $WWW::TheEchoNest::VERSION = "0.1";
-    # Log::Log4perl->easy_init();
+    $WWW::TheEchoNest::VERSION = "0.2";
 }
 
 use Data::Dumper;
@@ -1264,11 +1260,11 @@ sub send_get_request {
                 # look for the possibilty that we feed too many
                 # to a seed
                 if ( $has_limit && $param->[2] == 1 && $self->seed_count_met(\%seed_count) ) {
-                    print "Seed limit met, skipping $param->[0]\n" if $self->debug;
+                    warn "Seed limit met, skipping $param->[0]\n" if $self->debug;
                     
                 } else {
                 
-                    print "OK (normal) - $param->[1]\n" if $self->debug();
+                    warn "OK (normal) - $param->[1]\n" if $self->debug();
                     push @from_attributes , "$param->[0]=" . uri_escape($attributes->{$param->[0]});
                     if ($has_limit && $param->[2] == 1) {
                         # attempting to leverage the data structure that
@@ -1290,7 +1286,7 @@ sub send_get_request {
     
     print "$url\n" if $self->debug;
     
-    my $mech = WWW::Mechanize->new();
+    my $mech = WWW::Mechanize->new( autocheck => 0 );
     $mech->get( $url );
     
     #my $hd;
@@ -1315,6 +1311,7 @@ sub is_valid_json {
         return 1;
     }
 }
+
 
 sub send_post_request {
     my $self = shift;
@@ -1402,7 +1399,7 @@ sub send_post_request {
                     );
         
     } else {
-        $mech = WWW::Mechanize->new(  );
+        $mech = WWW::Mechanize->new( autocheck => 0 );
         $mech->post( $url , [ $extra ] );
     }
     
@@ -1487,7 +1484,7 @@ sub request_with_no_minimum {
     return "error";
 }
 
-sub check_result_code {
+sub get_status_code {
     my ($self,$num_only) = @_;
 
     my ($code) = $self->get( 'status.code' );
@@ -1613,13 +1610,30 @@ WWW::TheEchoNest - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.1
+version 0.2
+
+=head1 SYNOPSIS
+
+See the specific types of calls for details. All types (Artist,Song,etc) inherit
+from this module and you could call them via those objects.
 
 =head1 DESCRIPTION
 
 WWW::TheEchoNest provides a robust wrapper around The Echo Nest API to provide
 access to nearly all the current features and provide some flexibility should
-features change without having to rely on an update to this module
+features change without having to rely on an update to this module.
+
+You B<must> read The Echo Nest documentation. This module attempts to provide as
+much coverage as possible for their API and the structure resembles the calls
+url as closely as possible.  One excpetion to this is the catalog/dynamic calls
+that have an additional URL part (dynamic/create, etc), these are represented
+as dynamic_create, dynamic_next, etc.
+
+http://developer.echonest.com/docs/v4
+
+Have access to a JSON viewer to help develop and debug. The Chrome JSON viewer is
+very good and provides the exact path of the item within the JSON in the lower left
+of the screen as you mouse over an element.
 
 =head1 NAME
 
@@ -1627,7 +1641,7 @@ WWW::TheEchoNest
 
 =head1 REQUIRES
 
-L<Moose> 
+Moose 
 
 L<IO::CaptureOutput> 
 
@@ -1645,86 +1659,207 @@ L<WWW::Mechanize>
 
 L<URI::Escape> 
 
+L<Digest::MD5::File>
+
+=head1 INHERITED METHODS
+
+You may see these mentioned in the examples in the Artist, Song, etc.
+
+=head2 debug
+
+When this is set to 1 debugging statements will be displayed.
+
+ $artist->debug(1);
+
+One item that will be displayed is the URL that was constructed. This can help
+you track down cases where your parameters were dropped.
+
+=head2 get
+
+Returns a specific item or array of items from the JSON result of the
+last action.
+
+ $song->search( title => 'Stairway to Heaven',
+                artist => 'Led Zeppelin'
+                );
+ 
+ my $track_id = $song->get( 'songs[0].tracks[0].id' );
+
+JSON::Path is the underlying library that actually parses the JSON.
+
+This can also be called in an array context so you can get all of the items.
+
+ $playlist->basic(
+                            artist => 'Weezer',
+                            type => 'artist-radio'
+                            );
+ 
+  my @songs = $catalog->get( 'songs[*]' );
+
+=head2 get_status_code
+
+ my $status_code_as_string = $artist->get_status_code();
+ 
+ or
+ 
+ my $status_code_as_number = $artist->get_status_code(1);
+
+Refer to The Echo Nest documentation for information on possible
+response codes.
+
+=head2 rate_limit
+
+The Echo Nest restricts calls to their API via a rate limit. To acces your
+current rate limit use the rate_limit method. It will return a numerical value
+that represents the number of requests per minute you are allowed to make.
+
+ $artist->rate_limit();
+
+=head2 rate_limit_remaining
+
+Will return the number of calls remaining in your rate limit
+
+ $artist->rate_limit_remaining();
+
+=head2 rate_limit_used
+
+Will return the number of calls you have made to the rate limit
+
+ $artist->rate_limit_used();
+
+=head2 get_header_item
+
+Will return any item you specify from the http header. You generally only
+need to use the rate_ calls, but if something changes in the API response
+this method would allow you to access it.
+
+ $artist->get_header_item('X-Rate-Limit');
+
+=head2 get_request_parameter
+
+There is an attempt to enforce that required items are passed for each call
+this method can help you determine what the current setting is for a particular
+call.
+
+ my @grp = $song->get_request_parameter( 'song/search' , 'limit' );
+
+It returns an array of the contents, will be 1 or 2 elements, the first is if the
+item is required and the second is if it has a limit of how many of them
+can be passed per request.
+
+In order to allow you to create your own restrictions or add items that become
+available after this module was created you can use the set_ method below
+
+=head2 set_request_parameter
+
+Allows you to add a new request parameter or enforce a restriction. For example
+you might want to enfore an artist_id is always passed into song/search
+
+ $artist->set_request_parameter( 'song/search' , [ 'artist_id' , 1  ] );
+
+or to add a new item
+
+ $artist->set_request_parameter( 'song/newfeature' , [ 'limit' , 1  ] );
+
+This same process is what disallows/prevents parameters that aren't already in the
+list from being sent.  See debug below for more into.
+
+=head1 auto_json_decode();
+
+When this is set all calls will return a perl data structure rather than the JSON
+
+ $artist->auto_json_decode(1);
+
+NOTE: You can still access the JSON via the last_result() method
+
+=head1 auto_xml_decode();
+
+When this is set all calls will return a perl data structure rather than XML
+
+You must also set the result_format to 'xml' for this to work
+
+ $artist->auto_xml_decode(1);
+
+NOTE: You can still access the XML via the last_result() method
+
+=head1 last_result();
+
+Will give you the actual output from the call to the API. The format will match the result_format
+you specified for the request. The default output is JSON.
+
+ print $artist->last_result();
+
+=head1 last_error();
+
+Will provide information on possible errors encounterd on your method call. This is a plain
+text string with content like:
+
+"invalid json passed into catalog/update"
+
+ print $artist->last_error();
+
 =head1 INTERNAL METHODS
 
 These typically never need to be used directly, but are provided here in case
 you feel the need to look under the hood.
 
+These are not documented as of the .02 release since they aren't normally needed
+possibly in future releases these will be documented more.
+
 =head2 attribute_error
 
- attribute_error();
+Provides access to attribute errors that are set when a call fails due to missing
+parameters or mispellings
+
+ $obj->attribute_error();
 
 =head2 build_url_base
 
- build_url_base();
+Can provide you with a base url if feed the proper paramters.
 
-=head2 check_result_code
-
- check_result_code();
+ $obj->build_url_base();
 
 =head2 format_results
 
- format_results();
-
-=head2 get
-
- get();
-
-=head2 get_header_item
-
- get_header_item();
-
-=head2 get_request_parameter
-
- get_request_parameter();
+ $obj->format_results();
 
 =head2 is_valid_id
 
- is_valid_id();
+ $obj->is_valid_id();
 
 =head2 part_of_seed_limit
 
- part_of_seed_limit();
-
-=head2 rate_limit
-
- rate_limit();
-
-=head2 rate_limit_remaining
-
- rate_limit_remaining();
-
-=head2 rate_limit_used
-
- rate_limit_used();
+ $obj->part_of_seed_limit();
 
 =head2 request_with_minimum
 
- request_with_minimum();
+ $obj->request_with_minimum();
 
 =head2 request_with_no_minimum
 
- request_with_no_minimum();
+ $obj->request_with_no_minimum();
 
 =head2 sanity_check_id
 
- sanity_check_id();
+ $obj->sanity_check_id();
 
 =head2 seed_count_met
 
- seed_count_met();
+ $obj->seed_count_met();
 
 =head2 send_get_request
 
- send_get_request();
+ $obj->send_get_request();
 
 =head2 send_post_request
 
- send_post_request();
+ $obj->send_post_request();
 
-=head2 set_request_parameter
+=head1 THANKS
 
- set_request_parameter();
+Brian Sorahan is the authoer of L<WWW::EchoNest> and some ideas and a couple
+chunks of code served as a guideline. It has many convience methods that
+may make it a better choice for some use cases.
 
 =head1 AUTHOR
 

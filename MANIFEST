@@ -6,14 +6,12 @@ MYMETA.yml
 Makefile
 Makefile.PL
 README
-README.md
 dist.ini
 ignore.txt
 lib/WWW/TheEchoNest.pm
 lib/WWW/TheEchoNest/Artist.pm
 lib/WWW/TheEchoNest/Codegen.pm
 lib/WWW/TheEchoNest/Playlist.pm
-lib/WWW/TheEchoNest/Sandbox.pm
 lib/WWW/TheEchoNest/Song.pm
 lib/WWW/TheEchoNest/TasteProfile.pm
 lib/WWW/TheEchoNest/Track.pm

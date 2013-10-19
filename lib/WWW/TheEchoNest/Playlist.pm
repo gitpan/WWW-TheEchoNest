@@ -1,10 +1,12 @@
 
 package WWW::TheEchoNest::Playlist;
 
+# ABSTRACT: Wrapper for The Echo Nest API of music intelligence playlist calls
+
 use Moose;
 
 {
-    $WWW::TheEchoNest::Playlist::VERSION = '1.0';
+    $WWW::TheEchoNest::Playlist::VERSION = '0.2';
 }
 
 extends 'WWW::TheEchoNest';
@@ -80,59 +82,143 @@ __END__
 
 =head1 NAME
 
-WWW::TheEchoNest::Playlist
+WWW::TheEchoNest::Playlist - Wrapper for The Echo Nest API of music intelligence playlist calls
 
 =head1 VERSION
 
-version 0.1
+version 0.2
+
+=head1 SYNOPSIS
+
+    my $api_key = 'YOUR API KEY';
+    
+    my $artist = 'Weezer';
+    
+    my $playlist = WWW::TheEchoNest::Playlist->new(
+                                              api_key => $api_key
+                                             );
+    
+    my $artist_obj = WWW::TheEchoNest::Artist->new(
+        api_key => $api_key
+    );
+    
+    my @genres = $artist_obj->list_genres();
+    
+    $playlist->basic(
+                     artist  => $artist,
+                     results => 20,
+                     type    => 'artist-radio'
+                     );
+    
+    my $first_song_id = $playlist->get( 'songs[0].id' );
+    
+    $playlist->basic(
+      artist => $artist,
+      results => 2,
+      type => 'artist-radio',
+      bucket => [ 'id:7digital-US' , 'tracks' ],
+      limit => 'true'  
+    );
+
+    # if you are using dynamic playlists you need to keep track of the session
+    
+    $playlist->dynamic_create(
+                 artist  => $artist,
+                 results => 20,
+                 type    => 'artist-radio'
+                 );
+    
+    my $session_id = $playlist->get( 'session_id' );
+    
+    # the session_id is a 32 md5 hash
+    
+    $playlist->dynamic_next( 
+        session_id => $session
+    );
+    
+    my $first_song_tile = $playlist->get( 'songs[0].title' );
 
 =head1 NAME
 
 WWW::TheEchoNest::Playlist
 
-=head1 REQUIRES
-
-L<Moose> 
-
 =head1 METHODS
 
 =head2 basic
 
- basic();
-
-=head2 dynamic_create
-
- dynamic_create();
-
- special case, returns the actual session_id if request was successful
-
-=head2 dynamic_delete
-
- dynamic_delete();
-
-=head2 dynamic_feedback
-
- dynamic_feedback();
-
-=head2 dynamic_info
-
- dynamic_info();
-
-=head2 dynamic_next
-
- dynamic_next();
-
-=head2 dynamic_restart
-
- dynamic_restart();
-
-=head2 dynamic_steer
-
- dynamic_steer();
+ my $song_id = "SOHTZUF12A8C13582B";
+ 
+ $playlist->basic(
+        song_id   => $song_id ,
+        results => 20,
+        type    => 'song-radio');
+        
+ my $first_song_tile = $playlist->get( 'songs[0].title' );
 
 =head2 static
 
- static();
+ $playlist->static(
+        genre   => "dance pop",
+        results => 20,
+        type    => 'genre-radio'
+ );
+ 
+ my $first_song_tile = $playlist->get( 'songs[0].title' );
+
+=head2 dynamic_create
+
+Create a dynamic playlist, which is similar to playlists with less complexity
+
+    $playlist->dynamic_create(
+                 artist  => $artist,
+                 results => 20,
+                 type    => 'artist-radio'
+                 );
+    
+    # it is important that you keep track of the session id as this is how you will interact with it.
+    
+    my $session_id = $playlist->get( 'session_id' );
+
+special case, returns the actual session_id if request was successful
+
+=head2 dynamic_delete
+
+Delete a previously created dynamic playlist, you need to pass in the session_id
+
+ $playlist->dynamic_delete( session_id => $session );
+
+=head2 dynamic_feedback
+
+ $playlist->dynamic_feedback();
+
+=head2 dynamic_info
+
+ $playlist->dynamic_info();
+
+=head2 dynamic_next
+
+ $playlist->dynamic_next( session_id => $session );
+
+=head2 dynamic_restart
+
+Allows you to reset the playlist with a new seed artist
+
+ $playlist->dynamic_restart(
+    session_id => $session_id,
+    type => 'artist-radio',
+    artist => 'Queen'
+    );
+
+=head2 dynamic_steer
+
+Allows you influence the playlist by asking for "more like this" etc.
+
+ my $playlist_song = 'VALID SONG ID';
+
+ $playlist->dynamic_steer(
+        session_id => $session_id,
+        more_like_this => $playlist_song
+ );
 
 =head1 AUTHOR
 

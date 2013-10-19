@@ -4,7 +4,7 @@ use Moose;
 
 extends 'WWW::TheEchoNest';
 
-# ABSTRACT: Wrapper for The Echo Nest API of music intelligence
+# ABSTRACT: Wrapper for The Echo Nest API of music intelligence echoprint codegen
 
 use Scalar::Util qw(tainted);
 use IO::CaptureOutput qw( capture qxx qxy );
@@ -78,20 +78,22 @@ __END__
 
 =head1 NAME
 
-WWW::TheEchoNest::Codegen - Wrapper for The Echo Nest API of music intelligence
+WWW::TheEchoNest::Codegen - Wrapper for The Echo Nest API of music intelligence echoprint codegen
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 DESCRIPTION
 
- You should not need to use these methods directly, they are used for song/identify calls
- 
- You may however want to set some of the paramters as the defaults assume the
- echoprint codegen binary is in your path and working correctly.
- 
- start_x_seconds_in x_seconds_of_audio file_location
+You should not need to use these methods directly, they are used for song/identify calls
+
+You may however want to set some of the paramters as the defaults assume the
+echoprint codegen binary is in your path and working correctly.
+
+ start_x_seconds_in
+ x_seconds_of_audio
+ file_location
 
 =head1 NAME
 
@@ -101,7 +103,7 @@ WWW::TheEchoNest::Codegen
 
 =head2 codegen_mp3
 
- codegen_mp3([start offset],[seconds],[path]);
+ $song->codegen_mp3([start offset],[seconds],[path]);
 
 =head2 start_x_seconds_in
 

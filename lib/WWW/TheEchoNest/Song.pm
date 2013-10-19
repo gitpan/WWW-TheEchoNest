@@ -4,7 +4,7 @@ package WWW::TheEchoNest::Song;
 use Moose;
 use Scalar::Util;
 
-# ABSTRACT: Wrapper for The Echo Nest API of music intelligence
+# ABSTRACT: Wrapper for The Echo Nest API of music intelligence song calls
 
 {
     $WWW::TheEchoNest::Song::VERSION = '1.0';
@@ -62,11 +62,11 @@ __END__
 
 =head1 NAME
 
-WWW::TheEchoNest::Song - Wrapper for The Echo Nest API of music intelligence
+WWW::TheEchoNest::Song - Wrapper for The Echo Nest API of music intelligence song calls
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 DESCRIPTION
 
@@ -81,20 +81,30 @@ WWW::TheEchoNest::Song
 
 =head1 REQUIRES
 
+song/identify requires you install echoprint-codegen
+
+https://github.com/echonest/echoprint-codegen
+
 =head1 METHODS
 
 =head2 identify
 
-To heep this method simple you can generally call it with the custom parameter of
+To keep this method simple you can generally call it with the custom parameter of
 file_location.  When that is the only parameter passed in most of the heavy lifting
 is done under the hood.
 
-If you are not getting good results there are a couple of tuning options, set
-the start offset and length of encoded audio to send as outlined in the WWW::TheEchoNest::Codegen
-module.
+ $song->identify(
+    file_location => '/the/path/to/the/mp3',
+ );
+
+If you are not getting good results try setting the start offset and length of encoded
+audio to send as outlined in the L<WWW::TheEchoNest::Codegen> module.
 
 Currently Over The Air (OTA) recordings are not well supported by song/identify so
 be sure the audio source file is as distortion free as possible.
+
+You can also call this using all of the API parameters, but you will need to create a valid
+codegen JSON block for the 'query' parameter.
 
  $song->identify(
     query => '[ ..json from codegen .. ]'

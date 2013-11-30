@@ -36,7 +36,7 @@ sub identify {
             my $json = $code_gen->codegen_mp3();
             
             if ( $self->debug() ) {
-                print "$json\n";
+                warn "$json\n";
             }
             if ($self->is_valid_json($json,'song_identify') == 1) {
                 $extra{query} = $json;
@@ -66,7 +66,7 @@ WWW::TheEchoNest::Song - Wrapper for The Echo Nest API of music intelligence son
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 DESCRIPTION
 

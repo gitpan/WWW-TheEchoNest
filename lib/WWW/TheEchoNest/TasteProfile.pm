@@ -122,7 +122,7 @@ WWW::TheEchoNest::TasteProfile - Wrapper for The Echo Nest API of music intellig
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

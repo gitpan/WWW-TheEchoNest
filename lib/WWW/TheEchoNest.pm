@@ -3,7 +3,7 @@ package WWW::TheEchoNest;
 use Moose;
 
 BEGIN {
-    $WWW::TheEchoNest::VERSION = "0.3";
+    $WWW::TheEchoNest::VERSION = "0.4";
 }
 
 use Data::Dumper;
@@ -1014,7 +1014,7 @@ sub attribute_error {
     my $self = shift;
     my $message = shift || '';
     if ($self->debug) {
-        print "$message\n";
+        warn "$message\n";
     } else {
         $self->problem($message);
     }
@@ -1065,7 +1065,7 @@ sub get {
     
     my $search_ref = $result->{response};
     
-    print Dumper($result) if $self->debug();
+    warn Dumper($result) if $self->debug();
     
     foreach my $key (@return) {
         my $type = 'value';
@@ -1178,7 +1178,7 @@ sub send_get_request {
     
     $url .= "&format=" . $self->result_format();
     
-    print "'$call_type'\n" if $self->debug();
+    warn "'$call_type'\n" if $self->debug();
     
     # now depending on the call_type we look for attributes that *might* be passed and are *legal*
     my @from_attributes;
@@ -1284,7 +1284,7 @@ sub send_get_request {
         $url .= '&' . $param_string;
     }
     
-    print "$url\n" if $self->debug;
+    warn "$url\n" if $self->debug;
     
     my $mech = WWW::Mechanize->new( autocheck => 0 );
     $mech->get( $url );
@@ -1363,7 +1363,7 @@ sub send_post_request {
         return "Unable to make uri, got this '$url' instead\n";
     }
     
-    print $url , "\n" if $self->debug();
+    warn $url , "\n" if $self->debug();
     
     my $mech;
     my $file;
@@ -1610,12 +1610,19 @@ WWW::TheEchoNest - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
 See the specific types of calls for details. All types (Artist,Song,etc) inherit
 from this module and you could call them via those objects.
+
+L<WWW::TheEchoNest::Artist>
+L<WWW::TheEchoNest::Codegen>
+L<WWW::TheEchoNest::Playlist>
+L<WWW::TheEchoNest::Song>
+L<WWW::TheEchoNest::TasteProfile>
+L<WWW::TheEchoNest::Track>
 
 =head1 DESCRIPTION
 
@@ -1699,9 +1706,9 @@ This can also be called in an array context so you can get all of the items.
 =head2 get_status_code
 
  my $status_code_as_string = $artist->get_status_code();
- 
- or
- 
+
+or
+
  my $status_code_as_number = $artist->get_status_code(1);
 
 Refer to The Echo Nest documentation for information on possible
@@ -1762,9 +1769,9 @@ or to add a new item
  $artist->set_request_parameter( 'song/newfeature' , [ 'limit' , 1  ] );
 
 This same process is what disallows/prevents parameters that aren't already in the
-list from being sent.  See debug below for more into.
+list from being sent.  See debug below for more info.
 
-=head1 auto_json_decode();
+=head1 auto_json_decode
 
 When this is set all calls will return a perl data structure rather than the JSON
 
@@ -1772,7 +1779,7 @@ When this is set all calls will return a perl data structure rather than the JSO
 
 NOTE: You can still access the JSON via the last_result() method
 
-=head1 auto_xml_decode();
+=head1 auto_xml_decode
 
 When this is set all calls will return a perl data structure rather than XML
 
@@ -1782,14 +1789,14 @@ You must also set the result_format to 'xml' for this to work
 
 NOTE: You can still access the XML via the last_result() method
 
-=head1 last_result();
+=head1 last_result
 
 Will give you the actual output from the call to the API. The format will match the result_format
 you specified for the request. The default output is JSON.
 
  print $artist->last_result();
 
-=head1 last_error();
+=head1 last_error
 
 Will provide information on possible errors encounterd on your method call. This is a plain
 text string with content like:
@@ -1854,6 +1861,18 @@ Can provide you with a base url if feed the proper paramters.
 =head2 send_post_request
 
  $obj->send_post_request();
+
+=head2 get_file_extension
+
+ $obj->get_file_extension();
+
+=head2 get_resource_md5
+
+ $obj->get_resource_md5();
+
+=head2 is_valid_json
+
+ $obj->is_valid_json();
 
 =head1 THANKS
 

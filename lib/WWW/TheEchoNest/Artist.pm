@@ -22,7 +22,7 @@ sub consolidate {
 
     foreach my $item (@items) {
         if ( $self->debug() ) {
-            print Dumper(\%extra);
+            warn Dumper(\%extra);
         }
         # need to document the difference between normal and auto_json_decode
         # return values
@@ -178,7 +178,7 @@ WWW::TheEchoNest::Artist - Wrapper for The Echo Nest API of music intelligence a
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

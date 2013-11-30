@@ -86,7 +86,7 @@ WWW::TheEchoNest::Playlist - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 

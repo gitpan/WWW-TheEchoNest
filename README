@@ -28,6 +28,7 @@ To install this module, run the following commands:
 
 	perl Makefile.PL
 	make
+	# optional, but less through tests without API key
 	export EN_API_KEY=[your echo nest api key]
 	make test
 	make install

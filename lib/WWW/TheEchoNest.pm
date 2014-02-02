@@ -3,7 +3,7 @@ package WWW::TheEchoNest;
 use Moose;
 
 BEGIN {
-    $WWW::TheEchoNest::VERSION = "0.4";
+    $WWW::TheEchoNest::VERSION = "1.1";
 }
 
 use Data::Dumper;
@@ -669,14 +669,14 @@ my %call_type_attributes = (
 
    # TASTE PROFILE PARAMETERS
     
-    'catalog/create' => [
+    'tasteprofile/create' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'name', 1  ],
         [ 'type', 1  ]
     ],
     
-    'catalog/update' => [
+    'tasteprofile/update' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],
@@ -684,13 +684,13 @@ my %call_type_attributes = (
         [ 'data' , 0 ]
     ],
     
-    'catalog/keyvalues' => [
+    'tasteprofile/keyvalues' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],       
     ],
     
-    'catalog/play' => [
+    'tasteprofile/play' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -698,7 +698,7 @@ my %call_type_attributes = (
         [ 'plays', 0  ]       
     ],
 
-    'catalog/skip' => [
+    'tasteprofile/skip' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -706,7 +706,7 @@ my %call_type_attributes = (
         [ 'skips', 0  ]       
     ],    
 
-    'catalog/favorite' => [
+    'tasteprofile/favorite' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -714,7 +714,7 @@ my %call_type_attributes = (
         [ 'favorite', 0  ]       
     ],
     
-    'catalog/ban' => [
+    'tasteprofile/ban' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -722,7 +722,7 @@ my %call_type_attributes = (
         [ 'ban', 0  ]       
     ],
     
-    'catalog/rate' => [
+    'tasteprofile/rate' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -730,19 +730,19 @@ my %call_type_attributes = (
         [ 'rating', 0  ]       
     ],
 
-    'catalog/status' => [
+    'tasteprofile/status' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'ticket', 1  ]       
     ],
     
-    'catalog/profile' => [
+    'tasteprofile/profile' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id|name', 1  ],  
     ],     
     
-    'catalog/read' => [
+    'tasteprofile/read' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -752,7 +752,7 @@ my %call_type_attributes = (
         [ 'start' , 0 ]
     ],     
 
-    'catalog/feed' => [
+    'tasteprofile/feed' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],  
@@ -763,20 +763,20 @@ my %call_type_attributes = (
         [ 'high_relevance' , 0 ]
     ],   
 
-    'catalog/delete' => [
+    'tasteprofile/delete' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ]
     ],
     
-    'catalog/list' => [
+    'tasteprofile/list' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'results', 0  ],
         [ 'start' , 0 ]
     ],
 
-    'catalog/similar' => [
+    'tasteprofile/similar' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],
@@ -785,7 +785,7 @@ my %call_type_attributes = (
         [ 'keyvalue' , 0 ]
     ],
 
-    'catalog/predict' => [
+    'tasteprofile/predict' => [
         [ 'format', 0  ],
         [ 'callback', 0  ],
         [ 'id', 1  ],
@@ -815,6 +815,16 @@ my %call_type_attributes = (
         [ 'oauth_signature', 0  ]        
     ],
 );
+
+# need to map tasteprofile calls to catalog for backward compatibility
+
+foreach my $call_type ( keys %call_type_attributes ) {
+    if ($call_type =~ /tasteprofile/) {
+        my ($tp,$thecall) = split('/',$call_type);
+        $call_type_attributes{'catalog/'.$thecall} = $call_type_attributes{$call_type};
+    }
+    
+}
 
 # Taken from WWW::Echonest for initial iteration
 
@@ -1367,7 +1377,12 @@ sub send_post_request {
     
     my $mech;
     my $file;
+    
+    # needed to ignore SSL host verification
+    $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+    
     if ($self->call_type($uri_part) =~ /upload/ ) {
+       
         $mech = WWW::Mechanize->new( );
         # $mech->add_header( $headers->[0] => $headers->[1] );
         $url .= "?api_key=" . $self->api_key();
@@ -1584,6 +1599,7 @@ sub get_resource_md5 {
     if ($resource =~ /^http|ftp/) {
         # getting data from online
         # lets see if we can avoid the actaul analysis and get an md5
+        $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
         $md5 = url_md5_hex($resource);   
     } else  {
         # using a local audio file
@@ -1610,7 +1626,7 @@ WWW::TheEchoNest - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.4
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -1632,7 +1648,7 @@ features change without having to rely on an update to this module.
 
 You B<must> read The Echo Nest documentation. This module attempts to provide as
 much coverage as possible for their API and the structure resembles the calls
-url as closely as possible.  One excpetion to this is the catalog/dynamic calls
+url as closely as possible.  One excpetion to this is the tasteprofile/dynamic calls
 that have an additional URL part (dynamic/create, etc), these are represented
 as dynamic_create, dynamic_next, etc.
 
@@ -1771,7 +1787,7 @@ or to add a new item
 This same process is what disallows/prevents parameters that aren't already in the
 list from being sent.  See debug below for more info.
 
-=head1 auto_json_decode
+=head2 auto_json_decode
 
 When this is set all calls will return a perl data structure rather than the JSON
 
@@ -1779,7 +1795,7 @@ When this is set all calls will return a perl data structure rather than the JSO
 
 NOTE: You can still access the JSON via the last_result() method
 
-=head1 auto_xml_decode
+=head2 auto_xml_decode
 
 When this is set all calls will return a perl data structure rather than XML
 
@@ -1789,19 +1805,19 @@ You must also set the result_format to 'xml' for this to work
 
 NOTE: You can still access the XML via the last_result() method
 
-=head1 last_result
+=head2 last_result
 
 Will give you the actual output from the call to the API. The format will match the result_format
 you specified for the request. The default output is JSON.
 
  print $artist->last_result();
 
-=head1 last_error
+=head2 last_error
 
 Will provide information on possible errors encounterd on your method call. This is a plain
 text string with content like:
 
-"invalid json passed into catalog/update"
+"invalid json passed into tasteprofile/update"
 
  print $artist->last_error();
 
@@ -1886,7 +1902,7 @@ Aaron Johnson <aaronjjohnson@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Aaron Johnson.
+This software is copyright (c) 2014 by Aaron Johnson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

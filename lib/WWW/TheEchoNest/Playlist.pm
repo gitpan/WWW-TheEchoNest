@@ -6,7 +6,7 @@ package WWW::TheEchoNest::Playlist;
 use Moose;
 
 {
-    $WWW::TheEchoNest::Playlist::VERSION = '1.0';
+    $WWW::TheEchoNest::Playlist::VERSION = '1.1';
 }
 
 extends 'WWW::TheEchoNest';
@@ -86,7 +86,7 @@ WWW::TheEchoNest::Playlist - Wrapper for The Echo Nest API of music intelligence
 
 =head1 VERSION
 
-version 0.4
+version 1.1
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,7 @@ Aaron Johnson <aaronjjohnson@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Aaron Johnson.
+This software is copyright (c) 2014 by Aaron Johnson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

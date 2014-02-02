@@ -74,7 +74,7 @@ SKIP: {
                     # this is a special case for track/uplad where we add a paramter called force so we can
                     # send the file even if we think it already exists
                     force => 1,
-                    url => 'http://www.gina.net/test.mp3',
+                    url => 'https://s3.amazonaws.com/misc-aaronjj/cpan/test.mp3',
                     filetype => 'mp3'
                     );
     

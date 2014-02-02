@@ -188,7 +188,7 @@ SKIP: {
                      data => $bad_json
                     );
     
-    ok( $catalog->last_error() eq 'invalid json passed into catalog/update' , 'catalog update rejects bad json');
+    ok( $catalog->last_error() eq 'invalid json passed into tasteprofile/update' , 'catalog update rejects bad json');
     
     # to test key value we need add some key values to an item
     

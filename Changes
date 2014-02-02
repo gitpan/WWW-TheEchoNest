@@ -1,5 +1,18 @@
 Revision history for WWW-TheEchoNest
 
+1.1     2014-02-02
+        - Moved all versions to 1.1
+
+0.05    2014-02-02
+        - Moved all 'catalog' calls to 'tasteprofile' - existing catalog calls should
+        still work until fully deprecated by The Echo Nest
+        - Moved test mp3 into S3
+        - Documentation formatting cleaned up
+        - 
+
+0.04    2013-12-31
+        Minor tweaks, no change to functionality
+
 0.01    2013-10-01
         First version
 
